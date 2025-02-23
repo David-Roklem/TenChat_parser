@@ -1,0 +1,17 @@
+.git
+.gitignore
+.gitattributes
+
+docker-compose.yml
+Dockerfile
+.docker
+.dockerignore
+
+.venv/
+
+.python-version
+
+pyproject.toml
+uv.lock
+
+README.md
