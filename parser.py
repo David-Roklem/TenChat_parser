@@ -171,7 +171,7 @@ def main():
                 save_comment(comments_data[0], now)
             print(f"Ожидаю {delay_input} минут до следующей проверки...\n\n")
             sleep(delay_input*60)
-    return comments_data if user_input == 1 else "_|_Работа скрипта прервана_|_"
+    return comments_data if user_input == "1" else "_|_Работа скрипта прервана_|_"
 
 
 if __name__ == "__main__":
