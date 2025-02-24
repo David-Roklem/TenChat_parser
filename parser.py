@@ -148,7 +148,7 @@ def main():
     if user_input not in ["1", "2"]:
         return input_warning
     if user_input == "1":
-        comments_data = get_comments_data()
+        comments_data = get_comments_data(previous_comment_text)
     else:
         input_prompt = "Задайте частоту в минутах, с которой скрипт будет проверять наличие нового комментария: "
         wrong_delay_type = "Задержка задается только с помощью целых чисел!"
@@ -171,7 +171,7 @@ def main():
                 save_comment(comments_data[0], now)
             print(f"Ожидаю {delay_input} минут до следующей проверки...\n\n")
             sleep(delay_input*60)
-    return "_|_Работа скрипта прервана_|_"
+    return comments_data if user_input == 1 else "_|_Работа скрипта прервана_|_"
 
 
 if __name__ == "__main__":
