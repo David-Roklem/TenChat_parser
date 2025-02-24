@@ -9,6 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import (
     ElementClickInterceptedException,
     NoSuchElementException,
+    StaleElementReferenceException,
 )
 from pprint import pprint
 
@@ -41,6 +42,8 @@ def open_all_comments():
         except ElementClickInterceptedException:
             # Если возникает исключение, используем JavaScript для клика
             driver.execute_script("arguments[0].click();", more_comments_button)
+        except StaleElementReferenceException:
+            continue
 
     page = driver.page_source
     teardown(driver)
