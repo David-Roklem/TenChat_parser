@@ -20,13 +20,24 @@ XPATH_BTN = "/html/body/div[1]/div/div[1]/div[2]/main/div/div[1]/div[1]/div/div/
 
 
 def open_all_comments():
+    """
+    Открывает все комментарии на странице.
+
+    Эта функция использует Selenium для автоматизации браузера и
+    кликает на кнопку "Показать больше комментариев", пока все
+    комментарии не будут загружены или не будет достигнуто
+    максимальное количество итераций.
+
+    :return: str
+        HTML-код страницы с загруженными комментариями.
+    """
     url = URL
-    driver: webdriver.Chrome = setup(url)
+    driver: webdriver.Chrome = setup_driver(url)
     driver.implicitly_wait(5)
 
     xpath_btn = XPATH_BTN
 
-    count_iterations = 0  # TODO запихать в декоратор
+    count_iterations = 0
     while True:
         count_iterations += 1
         if count_iterations > 10:
@@ -50,7 +61,16 @@ def open_all_comments():
     return page
 
 
-def setup(url: str):
+def setup_driver(url: str):
+    """
+    Настраивает и запускает экземпляр веб-драйвера Chrome.
+
+    :param url: str
+        URL-адрес страницы, которую необходимо открыть.
+
+    :return: webdriver.Chrome
+        Экземпляр веб-драйвера Chrome, готовый к использованию.
+    """
     chrome_options = Options()
     chrome_options.add_argument("--headless")  # Запуск в безголовом режиме
     chrome_options.add_argument("--no-sandbox")  # Отключение песочницы
@@ -61,10 +81,28 @@ def setup(url: str):
 
 
 def teardown(driver):
+    """
+    Завершает работу веб-драйвера.
+
+    :param driver: webdriver.Chrome
+        Экземпляр веб-драйвера, который необходимо закрыть.
+    """
     driver.quit()
 
 
 def get_comments_data(previous_comment: str, last_comment_only: bool = False):
+    """
+    Получает данные комментариев с загруженной страницы.
+
+    :param previous_comment: str
+        Текст предыдущего комментария для проверки на новые комментарии.
+    :param last_comment_only: bool, по умолчанию False
+        Если True, возвращает только последний комментарий.
+
+    :return: list
+        Список словарей с данными комментариев, где каждый словарь
+        содержит имя комментатора, текст комментария и URL его фото.
+    """
     page = open_all_comments()
 
     soup = BeautifulSoup(page, "lxml")
@@ -108,10 +146,28 @@ def get_comments_data(previous_comment: str, last_comment_only: bool = False):
 
 
 def strip_comment_ending(text: str) -> str:
+    """
+    Удаляет окончание комментария "Развернуть".
+
+    :param text: str
+        Текст комментария.
+
+    :return: str
+        Текст комментария без окончания.
+    """
     return text.removesuffix("Развернуть")
 
 
 def get_commentator_profile(profile_link: str):
+    """
+    Получает имя и URL фото комментатора по ссылке на его профиль.
+
+    :param profile_link: str
+        Ссылка на профиль комментатора.
+
+    :return: tuple
+        Кортеж, содержащий имя комментатора и URL его фото.
+    """
     response = requests.get(profile_link)
     html = response.text
     soup = BeautifulSoup(html, "lxml")
@@ -123,6 +179,14 @@ def get_commentator_profile(profile_link: str):
 
 
 def download_photo(url, now_time: datetime):
+    """
+    Скачивает фото комментатора по указанному URL.
+
+    :param url: str
+        URL-адрес фото комментатора.
+    :param now_time: datetime
+        Время, используемое для именования файла.
+    """
     response = requests.get(url)
     if response.status_code == 200:
         # Открываем файл в бинарном режиме и записываем содержимое
@@ -133,6 +197,14 @@ def download_photo(url, now_time: datetime):
 
 
 def save_comment(comment_data: dict, now_time: datetime):
+    """
+    Сохраняет данные комментария в файл в формате Markdown.
+
+    :param comment_data: dict
+        Словарь с данными комментария, включая имя, текст и URL фото.
+    :param now_time: datetime
+        Время, используемое для именования файла.
+    """
     with open(f"saved_data/Комментарий_{now_time}.md", mode="a") as file:
         file.write(f"**{comment_data['name']}**\n\n\n")
         file.write(f"{comment_data['text']}\n\n\n")
